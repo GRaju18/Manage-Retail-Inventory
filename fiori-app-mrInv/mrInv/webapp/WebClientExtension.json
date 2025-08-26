@@ -1,0 +1,9 @@
+{
+    "tiles": [
+      {
+        "text": "Manage Retail Inventory",
+        "subtitle": "",
+        "icon": "sap-icon://general-leave-request"
+      }
+    ]
+  }

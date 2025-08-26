@@ -1,0 +1,29 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form">
+	<Dialog type="Message" state="Warning" contentWidth="60%" class="sapUiSizeCompact" stretch="{device>/system/phone}" title="Task cannot be completed. Selected batch is currently allocated to a sales order." draggable="true" resizable="true">
+		<content>
+			<VBox class="sapUiTinyMargin">
+				<Table inset="false" mode="None" items="{path:'/'}" width="100%">
+					<columns>
+						<Column mergeDuplicates="true">
+							<Label text="Batch Number" design="Bold"/>
+						</Column>
+						<Column>
+							<Label text="SO Number" design="Bold"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem>
+							<cells>
+								<Text text="{BatchNum}"/>
+								<Text text="{DocNum}"/>
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</VBox>
+		</content>
+		<endButton>
+			<Button type="Transparent" text="Close" press="allowDialogClose"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>
