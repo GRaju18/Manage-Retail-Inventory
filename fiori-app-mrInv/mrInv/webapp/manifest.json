@@ -1,7 +1,7 @@
 {
 	"_version": "1.12.0",
 	"sap.app": {
-		"id": "com.9b.mrinv",
+		"id": "com.9b.mrInv",
 		"type": "application",
 		"i18n": "i18n/i18n.properties",
 		"applicationVersion": {
@@ -37,7 +37,7 @@
 	"sap.ui5": {
 		"flexEnabled": false,
 		"rootView": {
-			"viewName": "com.9b.mrinv.view.App",
+			"viewName": "com.9b.mrInv.view.App",
 			"type": "XML",
 			"async": true,
 			"id": ""
@@ -58,7 +58,7 @@
 			"i18n": {
 				"type": "sap.ui.model.resource.ResourceModel",
 				"settings": {
-					"bundleName": "com.9b.mrinv.i18n.i18n"
+					"bundleName": "com.9b.mrInv.i18n.i18n"
 				}
 			}
 		},
@@ -72,7 +72,7 @@
 				"routerClass": "sap.f.routing.Router",
 				"viewType": "XML",
 				"async": true,
-				"viewPath": "com.9b.mrinv.view",
+				"viewPath": "com.9b.mrInv.view",
 				"controlAggregation": "pages",
 				"controlId": "app",
 				"clearControlAggregation": false,
@@ -81,20 +81,20 @@
 				}
 			},
 			"routes": [{
-				"name": "ManageRInv",
+				"name": "mrInv",
 				"pattern": "",
 				"titleTarget": "",
 				"greedy": false,
 				"target": [
-					"ManageRInv"
+					"MrInv"
 				]
 			}],
 			"targets": {
-				"ManageRInv": {
+				"MrInv": {
 					"viewType": "XML",
 					"transition": "slide",
 					"clearControlAggregation": true,
-					"viewName": "ManageRInv",
+					"viewName": "MrInv",
 					"controlAggregation": "pages"
 				}
 			}

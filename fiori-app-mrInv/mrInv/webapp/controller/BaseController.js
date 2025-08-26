@@ -10,7 +10,7 @@ sap.ui.define([
 ], function (Controller, UIComponent, History, MessageBox, Filter, FilterOperator, DateFormat) {
 	"use strict";
 
-	return Controller.extend("com.9b.mrinv.controller.BaseController", {
+	return Controller.extend("com.9b.mrInv.controller.BaseController", {
 		/**
 		 * Convenience method for accessing the router.
 		 * @public
@@ -104,7 +104,7 @@ sap.ui.define([
 				this.readServiecLayer("/b1s/v2/sml.svc/CV_SO_ALLOCATION_VW" + filters, function (data) {
 					if (data.value.length > 0) {
 						if (!that.allocationDialog) {
-							that.allocationDialog = sap.ui.xmlfragment("allocationDig", "com.9b.mrinv.view.fragments.AllocatedBatches", this);
+							that.allocationDialog = sap.ui.xmlfragment("allocationDig", "com.9b.mrInv.view.fragments.AllocatedBatches", this);
 							that.getView().addDependent(that.allocationDialog);
 						}
 						var sModel = new sap.ui.model.json.JSONModel();
@@ -212,7 +212,7 @@ sap.ui.define([
 		},
 		getAppConfigData: function () {
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
-			var filters = "?$filter=U_NAPP eq 'AllApps' or U_NAPP eq 'Manage Packages' or U_NAPP eq 'Manage Retail Inventory'";
+			var filters = "?$filter=U_NAPP eq 'AllApps' or U_NAPP eq 'Manage Inventory Retail'";
 			this.readServiecLayer("/b1s/v2/U_NCNFG" + filters, function (data) {
 				if (data.value.length > 0) {
 					var configObj = {};
@@ -234,9 +234,9 @@ sap.ui.define([
 							var itemGrpCodes = e.U_NVALUE;
 							jsonModel.setProperty("/itemGrpCodes", itemGrpCodes);
 						} else if (e.U_NFLDS === "Item groups") {
-							var itemGrpCodeMRI = e.U_NVALUE;
-							itemGrpCodeMRI = JSON.parse(itemGrpCodeMRI);
-							jsonModel.setProperty("/itemGrpCodeMRI", itemGrpCodeMRI);
+							var itemGrpCodemrInv = e.U_NVALUE;
+							itemGrpCodemrInv = JSON.parse(itemGrpCodemrInv);
+							jsonModel.setProperty("/itemGrpCodemrInv", itemGrpCodemrInv);
 						} else if (e.U_NFLDS === "Pricing Tier") {
 							var pricingTier = e.U_NVALUE;
 							pricingTier = JSON.parse(pricingTier);

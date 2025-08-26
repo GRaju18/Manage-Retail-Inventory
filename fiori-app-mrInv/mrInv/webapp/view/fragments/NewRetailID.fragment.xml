@@ -1,0 +1,25 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form">
+	<Dialog type="Message" contentWidth="50%" class="sapUiSizeCompact" stretch="{device>/system/phone}" title="New Retail ID" draggable="true"
+		resizable="true">
+		<content>
+			<List mode="None" items="{path:'jsonModel>/selectedRIDs'}" width="100%">
+				<CustomListItem>
+					<Input placeholder="Scan or enter Retail ID" value="{jsonModel>key}" width="100%"/>
+				</CustomListItem>
+				<headerToolbar>
+					<OverflowToolbar>
+						<Title text="METRC UID: {jsonModel>/sMETRCUID}"/>
+						<ToolbarSpacer/>
+						<Button icon="sap-icon://add" press="addRetailRows"/>
+					</OverflowToolbar>
+				</headerToolbar>
+			</List>
+		</content>
+		<beginButton>
+			<Button type="Emphasized" text="Save" press="confirmPostRetailID" enabled="{= !${jsonModel>/busyView} }"/>
+		</beginButton>
+		<endButton>
+			<Button type="Transparent" text="Cancel" press="confirmCancelRetailID"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

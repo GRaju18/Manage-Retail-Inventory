@@ -1,4 +1,4 @@
-<mvc:View controllerName="com.9b.mrinv.controller.ManageRInv" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:f="sap.f"
+<mvc:View controllerName="com.9b.mrInv.controller.MrInv" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:f="sap.f"
 	xmlns:commons="sap.suite.ui.commons" xmlns:core="sap.ui.core" xmlns:layout="sap.ui.layout" xmlns:table="sap.ui.table"
 	xmlns:fb="sap.ui.comp.filterbar" xmlns:tnt="sap.tnt">
 	<f:DynamicPage id="dynamicPageId" showFooter="true" class="dyPage custFDynamicPageTitle">
@@ -40,7 +40,7 @@
 		</f:title>
 		<f:content>
 			<FlexBox height="100%" class="fullHeight" direction="Column" visible="{= ${device>/system/phone} ? false : true}">
-				<table:Table id="ManageRInvTable" selectionMode="MultiToggle" visibleRowCountMode="Auto" columnMove="columnMove"
+				<table:Table id="mrInvTable" selectionMode="MultiToggle" visibleRowCountMode="Auto" columnMove="columnMove"
 					rows="{path:'jsonModel>/packagesData', sorter : { path : 'U_NDRDT', descending : true }}" cellClick="cellClick"
 					rowSelectionChange="handleRowSelection">
 					<table:extension>
@@ -51,6 +51,7 @@
 								liveChange="onChangeMultiInput" id="searchFieldTable" enableMultiLineMode="true"/>
 							<Button text="Clear All Filters" press="clearAllFilters"/>
 							<Text class="sapMTBSeparator"/>
+							<Button type="Default" press="handleNewRetailID" text="{i18n>newRetailID}"  enabled="{jsonModel>/batchDetailButton}"/>
 							<Button type="Default" press="handleNewPackage" text="{i18n>NewPackage}"/>
 							<!--	<Button type="Default" press="handleCreateLabSample" text="{i18n>CreateLabSample}" visible="{jsonModel>/configData/V_CLS}"/>-->
 							<Button type="Default" press="handleInventoryTransfer" text="{i18n>InventaryTransfer}" visible="{jsonModel>/configData/V_CTR}"/>
@@ -66,31 +67,31 @@
 						</OverflowToolbar>
 					</table:extension>
 					<table:columns>
-						<table:Column sortProperty="METRCUID" filterProperty="METRCUID" width="14%">
+						<table:Column sortProperty="METRCUID" filterProperty="METRCUID" width="20%">
 							<Label text="{i18n>METRCUID}" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{jsonModel>METRCUID}"/>
 							</table:template>
 						</table:Column>
-						<table:Column sortProperty="ItemName" filterProperty="ItemName" width="11%">
+						<table:Column sortProperty="ItemName" filterProperty="ItemName" width="20%">
 							<Label text="{i18n>Item}" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{jsonModel>ItemName}"/>
 							</table:template>
 						</table:Column>
-						<table:Column sortProperty="SourceUID" filterProperty="SourceUID" width="13%">
+						<table:Column sortProperty="SourceUID" filterProperty="SourceUID" width="20%">
 							<Label text="{i18n>SourceUID}" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{jsonModel>SourceUID}"/>
 							</table:template>
 						</table:Column>
-						<table:Column sortProperty="HarvestName" filterProperty="HarvestName" width="10%">
+						<table:Column sortProperty="HarvestName" filterProperty="HarvestName" width="20%">
 							<Label text="{i18n>HarvestName}" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{jsonModel>HarvestName}"/>
 							</table:template>
 						</table:Column>
-						<table:Column sortProperty="BinLocationName" filterProperty="BinLocationName" width="7%">
+						<table:Column sortProperty="BinLocationName" filterProperty="BinLocationName" width="10%">
 							<Label text="{i18n>Location}" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{jsonModel>BinLocationName}"/>
@@ -102,118 +103,30 @@
 								<Button text="{jsonModel>LABSTATUS}" busy="{jsonModel>reportBusy}" enabled="{jsonModel>ENLAB}" press="openLabReport" type="Transparent"/>
 							</table:template>
 						</table:Column>-->
-						<table:Column sortProperty="CreateDate" filterProperty="CreateDate" width="8%">
+						<table:Column sortProperty="CreateDate" filterProperty="CreateDate" width="10%">
 							<Label text="{i18n>CreateDate}" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{path:'jsonModel>CreateDate',formatter:'.formatter.dateDisplay'}" wrapping="true"/>
 							</table:template>
 						</table:Column>
-						<table:Column sortProperty="Quantity" filterProperty="Quantity" defaultFilterOperator="EQ" width="5rem">
+						<table:Column sortProperty="Quantity" filterProperty="Quantity" defaultFilterOperator="EQ" width="10%">
 							<Label text="{i18n>Quantity}" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{jsonModel>Quantity}"/>
 							</table:template>
 						</table:Column>
-						<table:Column sortProperty="U_Sourced" filterProperty="Quantity" defaultFilterOperator="EQ" width="5rem">
-							<Label text="Sourced" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>U_Sourced}"/>
-							</table:template>
-						</table:Column>
-						
-						<table:Column sortProperty="U_Allocation" filterProperty="newSalesPerson" width="5rem">
-							<Label text="Allocation" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>U_Allocation}"/>
-							</table:template>
-						</table:Column>
-						<table:Column sortProperty="U_Yellowhead" filterProperty="U_Yellowhead" width="5%">
-							<Label text="Yellow Head" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>U_Yellowhead}"/>
-							</table:template>
-						</table:Column>
-						<table:Column sortProperty="U_CD" filterProperty="U_CD" width="5%">
-							<Label text="CD" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>U_CD}"/>
-							</table:template>
-						</table:Column>
-						<table:Column sortProperty="U_Bottoms" filterProperty="U_Bottoms" width="5%">
-							<Label text="Bottoms" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>U_Bottoms}"/>
-							</table:template>
-						</table:Column>
-						<table:Column sortProperty="U_Micro" filterProperty="U_Micro" width="5%">
-							<Label text="Micro" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>U_Micro}"/>
-							</table:template>
-						</table:Column>
-						<table:Column sortProperty="U_Potency" filterProperty="U_Potency" width="5%" defaultFilterOperator="EQ">
-							<Label text="Potency" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>U_Potency}"/>
-							</table:template>
-						</table:Column>
-						<table:Column sortProperty="newIntrSerialPrice" filterProperty="newIntrSerialPrice" width="5%">
-							<Label text="Menu Price" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>newIntrSerialPrice}"/>
-							</table:template>
-						</table:Column>
-						<table:Column sortProperty="U_FloorPrice" filterProperty="U_FloorPrice" width="5%" defaultFilterOperator="EQ">
-							<Label text="Floor Price" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>U_FloorPrice}"/>
-							</table:template>
-						</table:Column>
-						<table:Column sortProperty="U_SalesNote" filterProperty="U_SalesNote" width="10%">
+						<table:Column sortProperty="U_SalesNote" filterProperty="U_SalesNote" width="15%">
 							<Label text="Sales Notes" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{jsonModel>U_SalesNote}"/>
 							</table:template>
 						</table:Column>
-						
-						<!--<table:Column sortProperty="U_PriceTier" filterProperty="U_PriceTier" width="5%">-->
-						<!--	<Label text="Price Tier" design="Bold" wrapping="true"/>-->
-						<!--	<table:template>-->
-						<!--		<Text text="{jsonModel>U_PriceTier}"/>-->
-						<!--	</table:template>-->
-						<!--</table:Column>-->
-						
-						<!--<table:Column sortProperty="U_PM" filterProperty="U_PM" width="5%">-->
-						<!--	<Label text="PM" design="Bold" wrapping="true"/>-->
-						<!--	<table:template>-->
-						<!--		<Text text="{jsonModel>U_PM}"/>-->
-						<!--	</table:template>-->
-						<!--</table:Column>-->
-						
-						<!--<table:Column sortProperty="U_Burned" filterProperty="U_Burned" width="5%">-->
-						<!--	<Label text="Burned" design="Bold" wrapping="true"/>-->
-						<!--	<table:template>-->
-						<!--		<Text text="{jsonModel>U_Burned}"/>-->
-						<!--	</table:template>-->
-						<!--</table:Column>-->
-						<!--<table:Column sortProperty="U_Bugs" filterProperty="U_Bugs" width="5%">-->
-						<!--	<Label text="Bugs" design="Bold" wrapping="true"/>-->
-						<!--	<table:template>-->
-						<!--		<Text text="{jsonModel>U_Bugs}"/>-->
-						<!--	</table:template>-->
-						<!--</table:Column>-->
-						<!--<table:Column sortProperty="U_SeedBana" filterProperty="U_SeedBana" width="5%">-->
-						<!--	<Label text="Seeded/Banana" design="Bold" wrapping="true"/>-->
-						<!--	<table:template>-->
-						<!--		<Text text="{jsonModel>U_SeedBana}"/>-->
-						<!--	</table:template>-->
-						<!--</table:Column>-->
-						<!--<table:Column sortProperty="U_Glass" filterProperty="U_Glass" width="5%">-->
-						<!--	<Label text="Glass" design="Bold" wrapping="true"/>-->
-						<!--	<table:template>-->
-						<!--		<Text text="{jsonModel>U_Glass}"/>-->
-						<!--	</table:template>-->
-						<!--</table:Column>-->
+						<table:Column width="10%" sortProperty="CreateTime" filterProperty="CreateTime" tooltip="CreateTime">
+							<Label text="" design="Bold"/>
+							<table:template>
+								<Button text="Retail Ids" press="viewRetailIds" type="Transparent" visible="{=${jsonModel>U_RETAILIDURL} === null ? false : true}"/>
+							</table:template>
+						</table:Column>
 					</table:columns>
 				</table:Table>
 			</FlexBox>

@@ -1,14 +1,14 @@
 sap.ui.define([
 	"sap/ui/core/UIComponent",
 	"sap/ui/Device",
-	"com/9b/mrinv/model/models",
+	"com/9b/mrInv/model/models",
 	"sap/f/FlexibleColumnLayoutSemanticHelper",
 	"sap/ui/model/json/JSONModel"
 
 ], function (UIComponent, Device, models, FlexibleColumnLayoutSemanticHelper, JSONModel) {
 	"use strict";
 
-	return UIComponent.extend("com.9b.mrinv.Component", {
+	return UIComponent.extend("com.9b.mrInv.Component", {
 
 		metadata: {
 			manifest: "json"
@@ -65,7 +65,7 @@ sap.ui.define([
 					MotherPlanner: "webclient-ext-motherplanner2-app-content-sapb1motherplanner",
 					DestroyedPlants: "webclient-ext-destroy-plant-app-content-sapb1destroy-plant",
 					Waste: "webclient-ext-waste-record-app-content-sapb1waste-record",
-					mrinv: "webclient-ext-mrinv-v2-app-content-sapb1mrinv",
+					inTake: "webclient-ext-inTake-v2-app-content-sapb1inTake",
 					METRCTag: "webclient-ext-metrc-tag-app-content-sapb1metrctag",
 					ReceiveProducts: "webclient-ext-receive-products-app-content-sapb1receive-products"
 				}
@@ -121,7 +121,7 @@ sap.ui.define([
 		_getDialog: function () {
 			if (!this.dialog) {
 				//this.dialog = sap.ui.xmlfragment("login.view.otp", this);
-				this.dialog = sap.ui.xmlfragment("sessionDialog", "com.9b.mrinv.view.fragments.SessionTimeoutDialog", this);
+				this.dialog = sap.ui.xmlfragment("sessionDialog", "com.9b.mrInv.view.fragments.SessionTimeoutDialog", this);
 			}
 			return this.dialog;
 		},

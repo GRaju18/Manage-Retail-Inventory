@@ -1,15 +1,15 @@
 sap.ui.define([
-	"com/9b/mrinv/controller/BaseController",
+	"com/9b/mrInv/controller/BaseController",
 	"sap/ui/core/Fragment",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"com/9b/mrinv/model/models",
+	"com/9b/mrInv/model/models",
 	"sap/ui/core/format/DateFormat"
 
 ], function (BaseController, Fragment, Filter, FilterOperator, model, DateFormat) {
 	"use strict";
 
-	return BaseController.extend("com.9b.mrinv.controller.ManageRInv", {
+	return BaseController.extend("com.9b.mrInv.controller.MrInv", {
 		formatter: model,
 
 		/**
@@ -21,9 +21,9 @@ sap.ui.define([
 			this.getAppConfigData();
 			this.getUsersService();
 			this.getMetricsCredentials();
-			var ManageRInvTable = this.getView().byId("ManageRInvTable");
+			var mrInvTable = this.getView().byId("mrInvTable");
 			var tableHeader = this.byId("tableHeader");
-			ManageRInvTable.addEventDelegate({
+			mrInvTable.addEventDelegate({
 				onAfterRendering: function () {
 					var oBinding = this.getBinding("rows");
 					oBinding.attachChange(function (oEvent) {
@@ -33,7 +33,7 @@ sap.ui.define([
 						tableHeader.setText("Packages (" + count + "/" + totalCount + ")");
 					});
 				}
-			}, ManageRInvTable);
+			}, mrInvTable);
 			this.combinedFilter = [];
 			var that = this;
 			/*	setInterval(function () {
@@ -43,9 +43,9 @@ sap.ui.define([
 		},
 
 		_objectMatched: function (oEvent) {
-			if (oEvent.getParameter("name") == 'ManageRInv') {
+			if (oEvent.getParameter("name") == 'mrInv') {
 				sap.ui.core.BusyIndicator.hide();
-				this.getView().byId("ManageRInvTable").clearSelection();
+				this.getView().byId("mrInvTable").clearSelection();
 				var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 				jsonModel.setProperty("/tagArray", []);
 				jsonModel.setProperty("/isSingleSelect", false);
@@ -239,8 +239,8 @@ sap.ui.define([
 			if (pageTo === "Waste") {
 				AppNavigator = serLayerTargetUrl.Waste;
 			}
-			if (pageTo === "ManageRInv") {
-				AppNavigator = serLayerTargetUrl.ManageRInv;
+			if (pageTo === "inTake") {
+				AppNavigator = serLayerTargetUrl.inTake;
 			}
 			if (pageTo === "METRCTag") {
 				AppNavigator = serLayerTargetUrl.METRCTag;
@@ -283,11 +283,11 @@ sap.ui.define([
 			this.getView().setBusy(true);
 			var filters = "?$filter=Status ne '1' and U_Phase eq 'Package' and BinLocationCode eq '" + selectedBincode +
 				"'";
-			var itemGrpCodeMRI = jsonModel.getProperty("/itemGrpCodeMRI");
-			if (itemGrpCodeMRI) {
+			var itemGrpCodemrInv = jsonModel.getProperty("/itemGrpCodemrInv");
+			if (itemGrpCodemrInv) {
 				filters = filters + " and (";
-				$.each(itemGrpCodeMRI, function (i, e) {
-					if (i < itemGrpCodeMRI.length - 1) {
+				$.each(itemGrpCodemrInv, function (i, e) {
+					if (i < itemGrpCodemrInv.length - 1) {
 						filters = filters + "ItemGroupCode eq " + e.key + " or ";
 					} else {
 						filters = filters + "ItemGroupCode eq " + e.key;
@@ -461,7 +461,7 @@ sap.ui.define([
 					}));
 				}
 			});
-			this.byId("ManageRInvTable").getBinding("rows").filter(andFilter);
+			this.byId("mrInvTable").getBinding("rows").filter(andFilter);
 		},
 
 		handlechangeGrowthPhase: function () {
@@ -469,7 +469,7 @@ sap.ui.define([
 			jsonModel.setProperty("/enableOk", true);
 			var sItems;
 			var updateObject, changegrowthphasedata = [];
-			var table = this.getView().byId("ManageRInvTable");
+			var table = this.getView().byId("mrInvTable");
 			sItems = table.getSelectedIndices();
 
 			$.each(sItems, function (i, e) {
@@ -483,7 +483,7 @@ sap.ui.define([
 			if (sItems.length > 0) {
 				if (!this.changeGrowthPhaseDialog) {
 					this.changeGrowthPhaseDialog = sap.ui.xmlfragment("changeGrowthPhaseDialog",
-						"com.9b.mrinv.view.fragments.ChangeGrowthPhase", this);
+						"com.9b.mrInv.view.fragments.ChangeGrowthPhase", this);
 					this.getView().addDependent(this.changeGrowthPhaseDialog);
 				}
 				this.changeGrowthPhaseDialog.open();
@@ -496,7 +496,7 @@ sap.ui.define([
 		onConfirmChangeGrowthPhase: function () {
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 			var sItems;
-			var table = this.getView().byId("ManageRInvTable");
+			var table = this.getView().byId("mrInvTable");
 			var sArrayObj = [];
 			sItems = table.getSelectedIndices();
 			// var changegrowthphasedata = jsonModel.getProperty("/changegrowthphasedata");
@@ -525,7 +525,7 @@ sap.ui.define([
 								that.getView().setBusy(false);
 								sap.m.MessageToast.show("Change growth phase completed succsessfully");
 								// that.onChangeGrowthPhaseClose();
-								that.byId("ManageRInvTable").setSelectedIndex(-1);
+								that.byId("mrInvTable").setSelectedIndex(-1);
 								that.loadMasterData();
 							});
 						}
@@ -553,13 +553,13 @@ sap.ui.define([
 		handlechangeLocation: function () {
 			var deviceModel = this.getView().getModel("device");
 			var sItems, that = this;
-			var table = this.getView().byId("ManageRInvTable");
+			var table = this.getView().byId("mrInvTable");
 			var sArrayObj = [];
 			sItems = table.getSelectedIndices();
 
 			if (sItems.length > 0) {
 				if (!this.changeLocationDialog) {
-					this.changeLocationDialog = sap.ui.xmlfragment("changeLocationDialog", "com.9b.mrinv.view.fragments.ChangeLocation",
+					this.changeLocationDialog = sap.ui.xmlfragment("changeLocationDialog", "com.9b.mrInv.view.fragments.ChangeLocation",
 						this);
 					this.getView().addDependent(this.changeLocationDialog);
 				}
@@ -628,8 +628,8 @@ sap.ui.define([
 			var isPhone = deviceModel.getProperty("/system/phone");
 			var sItems;
 
-			var ManageRInvTable = this.getView().byId("ManageRInvTable");
-			sItems = ManageRInvTable.getSelectedIndices();
+			var mrInvTable = this.getView().byId("mrInvTable");
+			sItems = mrInvTable.getSelectedIndices();
 			var isValidated = true;
 			// var locationID = sap.ui.core.Fragment.byId("changeLocationDialog", "location").getSelectedKey();
 			$.each(changeLocData, function (i, Obj) {
@@ -728,17 +728,17 @@ sap.ui.define([
 					var metrcUrl = "/packages/v2/location?licenseNumber=" + jsonModel.getProperty("/selectedLicense");
 					that.callMetricsService(metrcUrl, "PUT", metricPayload, function () {
 						sap.m.MessageToast.show("METRC sync completed successfully");
-						that.changeLocationtoTable(invTransferPostData, ManageRInvTable, that);
+						that.changeLocationtoTable(invTransferPostData, mrInvTable, that);
 					}, function (error) {
 						that.changeLocationDialog.setBusy(false);
 						sap.m.MessageToast.show(JSON.stringify(error));
 					});
 				} else {
-					that.changeLocationtoTable(invTransferPostData, ManageRInvTable, that);
+					that.changeLocationtoTable(invTransferPostData, mrInvTable, that);
 				}
 			}
 		},
-		changeLocationtoTable: function (invTransferPostData, ManageRInvTable, that) {
+		changeLocationtoTable: function (invTransferPostData, mrInvTable, that) {
 			that.changeLocationDialog.setBusy(true);
 			var count = invTransferPostData.length;
 			$.each(invTransferPostData, function (i, postObj) {
@@ -748,7 +748,7 @@ sap.ui.define([
 						that.changeLocationDialog.setBusy(false);
 						that.changeLocationDialog.close();
 						sap.m.MessageToast.show("Batch location changed successfully");
-						ManageRInvTable.clearSelection();
+						mrInvTable.clearSelection();
 						that.loadMasterData();
 					}
 				}.bind(that), postObj, "POST", that.changeLocationDialog);
@@ -866,7 +866,7 @@ sap.ui.define([
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 			var deviceModel = this.getView().getModel("device");
 			var isPhone = deviceModel.getProperty("/system/phone");
-			var ManageRInvTable = this.getView().byId("ManageRInvTable");
+			var mrInvTable = this.getView().byId("mrInvTable");
 			var that = this;
 			var cDate = that.convertUTCDateTime(new Date());
 			var sLincense = jsonModel.getProperty("/transLincense");
@@ -874,17 +874,17 @@ sap.ui.define([
 			var ChangeLocation2 = jsonModel.getProperty("/ChangeLocation2");
 			var sItems;
 
-			var ManageRInvTable = this.getView().byId("ManageRInvTable");
-			sItems = ManageRInvTable.getSelectedIndices();
+			var mrInvTable = this.getView().byId("mrInvTable");
+			sItems = mrInvTable.getSelectedIndices();
 			var batchUrl = [],
 				ItemCode,
 				BPLID;
-			// var sItems = ManageRInvTable.getSelectedIndices();
+			// var sItems = mrInvTable.getSelectedIndices();
 			var locationForTras = sap.ui.core.Fragment.byId("InventoryTransferDialog", "locationForTras");
 			var bplId = locationForTras.getSelectedItem().getBindingContext("jsonModel").getObject().BusinessPlaceID;
 			$.each(sItems, function (i, e) {
 				var payLoadInventory = {};
-				var sObj = ManageRInvTable.getContextByIndex(e).getObject();
+				var sObj = mrInvTable.getContextByIndex(e).getObject();
 				// InventoryExits
 
 				var returnObj = $.grep(jsonModel.getProperty("/allLocationList"), function (ele) {
@@ -964,7 +964,7 @@ sap.ui.define([
 				that.loadMasterData();
 				that.InventoryTransferDialog.close();
 				jsonModel.setProperty("/createTrasBusy", false);
-				ManageRInvTable.clearSelection();
+				mrInvTable.clearSelection();
 			});
 
 		},
@@ -978,7 +978,7 @@ sap.ui.define([
 			sModel.setProperty("/packagesData", packagesData);
 			var selectedLicense = jsonModel.getProperty("/selectedLicense");
 			if (!this.transTemDialog) {
-				this.transTemDialog = sap.ui.xmlfragment("TransTem", "com.9b.mrinv.view.fragments.TransferTemplate", this);
+				this.transTemDialog = sap.ui.xmlfragment("TransTem", "com.9b.mrInv.view.fragments.TransferTemplate", this);
 				this.getView().addDependent(this.transTemDialog);
 			}
 			that.transTemDialog.open();
@@ -1811,13 +1811,13 @@ sap.ui.define([
 			});
 
 			var sItems, licenselistfortrans = [];
-			var ManageRInvTable = this.getView().byId("ManageRInvTable");
+			var mrInvTable = this.getView().byId("mrInvTable");
 			var inventoryTransferTem = [],
 				batchData = [];
-			sItems = ManageRInvTable.getSelectedIndices();
+			sItems = mrInvTable.getSelectedIndices();
 			var sObj;
 			$.each(sItems, function (i, e) {
-				sObj = ManageRInvTable.getContextByIndex(e).getObject();
+				sObj = mrInvTable.getContextByIndex(e).getObject();
 				inventoryTransferTem.push(sObj);
 				batchData.push(sObj.METRCUID);
 			});
@@ -1836,7 +1836,7 @@ sap.ui.define([
 				var mainlicense = jsonModel.getProperty("/selectedLicense");
 				if (!this.InventoryTransferDialog) {
 					this.InventoryTransferDialog = sap.ui.xmlfragment("InventoryTransferDialog",
-						"com.9b.mrinv.view.fragments.InventoryTransferDialog",
+						"com.9b.mrInv.view.fragments.InventoryTransferDialog",
 						this);
 					this.getView().addDependent(this.InventoryTransferDialog);
 				}
@@ -2050,7 +2050,7 @@ sap.ui.define([
 					}]
 				};
 
-				var table = this.getView().byId("ManageRInvTable");
+				var table = this.getView().byId("mrInvTable");
 				var sItems = table.getSelectedIndices();
 				var payloadTransfer = [],
 					metrcPackageArr = [];
@@ -2217,7 +2217,8 @@ sap.ui.define([
 
 		allocationCall: function () {
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
-			this.readServiecLayer("/b1s/v2/UserFieldsMD?$filter=TableName eq 'OBTN' and Name eq 'Allocation' &$select=ValidValuesMD", function (data) {
+			this.readServiecLayer("/b1s/v2/UserFieldsMD?$filter=TableName eq 'OBTN' and Name eq 'Allocation' &$select=ValidValuesMD", function (
+				data) {
 				jsonModel.setProperty("/allocationDATA", data.value[0].ValidValuesMD);
 			});
 		},
@@ -2396,11 +2397,11 @@ sap.ui.define([
 			var that = this;
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 			var sItems;
-			var table = this.getView().byId("ManageRInvTable");
+			var table = this.getView().byId("mrInvTable");
 			sItems = table.getSelectedIndices();
 			if (sItems.length > 0) {
 				if (!this.batchDetailsDialog) {
-					this.batchDetailsDialog = sap.ui.xmlfragment("batchDetailsDialog", "com.9b.mrinv.view.fragments.BatchDetails", this);
+					this.batchDetailsDialog = sap.ui.xmlfragment("batchDetailsDialog", "com.9b.mrInv.view.fragments.BatchDetails", this);
 					this.getView().addDependent(this.batchDetailsDialog);
 				}
 
@@ -2567,7 +2568,7 @@ sap.ui.define([
 					that.batchDetailsDialog.setBusy(false);
 					that.loadMasterData();
 					jsonModel.setProperty("/batchDetailButton", false);
-					that.byId("ManageRInvTable").clearSelection();
+					that.byId("mrInvTable").clearSelection();
 					that.batchDetailsDialog.close();
 				}.bind(that), patchPayload, "PATCH");
 			}
@@ -2693,7 +2694,7 @@ sap.ui.define([
 			var that = this;
 			var jsonModel = this.getView().getModel("jsonModel");
 			if (!this.createDialog) {
-				this.createDialog = sap.ui.xmlfragment("ItemsDialog", "com.9b.mrinv.view.fragments.Items", this);
+				this.createDialog = sap.ui.xmlfragment("ItemsDialog", "com.9b.mrInv.view.fragments.Items", this);
 				this.getView().addDependent(this.createDialog);
 			}
 			that.createDialog.refParent = oEvent.getSource();
@@ -2707,7 +2708,7 @@ sap.ui.define([
 		handlechangeItemsMETRC: function () {
 			var that = this;
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
-			var mPkgTable = this.getView().byId("ManageRInvTable");
+			var mPkgTable = this.getView().byId("mrInvTable");
 			var metrcData = jsonModel.getProperty("/metrcData");
 			var sItems = mPkgTable.getSelectedIndices();
 			if (sItems.length > 0) {
@@ -2739,7 +2740,7 @@ sap.ui.define([
 				var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 				if (!this.changeItemMETRCDialog) {
 					this.changeItemMETRCDialog = sap.ui.xmlfragment("changeItemMETRCDialog",
-						"com.9b.mrinv.view.fragments.ChangeItemsMetrc", this);
+						"com.9b.mrInv.view.fragments.ChangeItemsMetrc", this);
 					this.getView().addDependent(this.changeItemMETRCDialog);
 				}
 				this.changeItemMETRCDialog.open();
@@ -2853,7 +2854,7 @@ sap.ui.define([
 									that.changeItemMETRCDialog.setBusy(false);
 									// that.changeItemMETRCDialog.close();
 									sap.m.MessageToast.show("METRC Sync Completed Successfully");
-									that.byId("ManageRInvTable").clearSelection();
+									that.byId("mrInvTable").clearSelection();
 									// that.loadMasterData();
 
 									that.changeItemInterncallPostings(changeItemsData, jsonModel, changeItemMETRCDialog);
@@ -2901,7 +2902,7 @@ sap.ui.define([
 								that.changeItemMETRCDialog.setBusy(false);
 								// that.changeItemMETRCDialog.close();
 								sap.m.MessageToast.show("METRC Sync Completed Successfully");
-								that.byId("ManageRInvTable").clearSelection();
+								that.byId("mrInvTable").clearSelection();
 								// that.loadMasterData();
 								that.changeItemInterncallPostings(changeItemsData, jsonModel, changeItemMETRCDialog);
 							}, function (error) {
@@ -3095,7 +3096,7 @@ sap.ui.define([
 															changeItemDialog.setBusy(false);
 															changeItemDialog.close();
 															sap.m.MessageToast.show("Package Created Successfully");
-															that.byId("ManageRInvTable").clearSelection();
+															that.byId("mrInvTable").clearSelection();
 															that.loadMasterData();
 														}
 
@@ -3109,7 +3110,7 @@ sap.ui.define([
 													changeItemDialog.setBusy(false);
 													changeItemDialog.close();
 													sap.m.MessageToast.show("Package Created Successfully");
-													that.byId("ManageRInvTable").clearSelection();
+													that.byId("mrInvTable").clearSelection();
 													that.loadMasterData();
 												}
 											}.bind(that), secondPatchCall, "PATCH");
@@ -3176,13 +3177,13 @@ sap.ui.define([
 			jsonModel.setProperty("/NPDNMCode", "");
 			var sArrayObj = [];
 			var batchData = [];
-			var harvestTable = this.byId("ManageRInvTable");
+			var harvestTable = this.byId("mrInvTable");
 			if (harvestTable.getSelectedIndices().length === 0) {
 				sap.m.MessageToast.show("Please select a batch");
 				return;
 			} else {
 				var sItems;
-				var table = this.getView().byId("ManageRInvTable");
+				var table = this.getView().byId("mrInvTable");
 				sItems = table.getSelectedIndices();
 				$.each(sItems, function (i, e) {
 					sObj = table.getContextByIndex(e).getObject();
@@ -3231,7 +3232,7 @@ sap.ui.define([
 				var jsonModel = this.getView().getModel("jsonModel");
 				this.loadItemData();
 				if (!this.createPackage) {
-					this.createPackage = sap.ui.xmlfragment("createNewPackage", "com.9b.mrinv.view.fragments.CreateNewPackages", this);
+					this.createPackage = sap.ui.xmlfragment("createNewPackage", "com.9b.mrInv.view.fragments.CreateNewPackages", this);
 					this.getView().addDependent(this.createPackage);
 				}
 
@@ -3678,7 +3679,7 @@ sap.ui.define([
 								that.createPackage.setBusy(false);
 								that.createPackage.close();
 								sap.m.MessageToast.show("Package created successfully");
-								that.byId("ManageRInvTable").clearSelection();
+								that.byId("mrInvTable").clearSelection();
 								that.loadMasterData();
 							}
 						});
@@ -3714,24 +3715,24 @@ sap.ui.define([
 		handlecombinePackages: function () {
 
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
-			var ManageRInvTable = this.byId("ManageRInvTable");
-			if (ManageRInvTable.getSelectedIndices().length === 0) {
+			var mrInvTable = this.byId("mrInvTable");
+			if (mrInvTable.getSelectedIndices().length === 0) {
 				sap.m.MessageToast.show("Please select a batch");
 				return;
 			} else {
 				var sItems, sArrayObj = [],
 					sObj;
-				sItems = ManageRInvTable.getSelectedIndices();
+				sItems = mrInvTable.getSelectedIndices();
 				var countQty = 0;
 				var arr = [],
 					batchData = [];
 				var itemCodeList;
 				jsonModel.setProperty("/NPDNMCode", "");
-				var itemGrpCodeMRI = jsonModel.getProperty("/itemGrpCodeMRI");
+				var itemGrpCodemrInv = jsonModel.getProperty("/itemGrpCodemrInv");
 				this.loadItemData();
 				itemCodeList = jsonModel.getProperty("/allItemsList");
 				$.each(sItems, function (i, e) {
-					sObj = ManageRInvTable.getContextByIndex(e).getObject();
+					sObj = mrInvTable.getContextByIndex(e).getObject();
 					sObj.STATUSQTY = "None";
 					sObj.U_NLABEL = "";
 					sObj.QTYTXT = "";
@@ -3750,7 +3751,7 @@ sap.ui.define([
 					batchData.push(sObj.METRCUID);
 				});
 
-				$.each(itemGrpCodeMRI, function (i, m) {
+				$.each(itemGrpCodemrInv, function (i, m) {
 					var rObj2 = $.grep(itemCodeList, function (item) {
 						if (item.ItemsGroupCode && m.key == item.ItemsGroupCode) {
 							arr.push(item);
@@ -3772,7 +3773,7 @@ sap.ui.define([
 			if (flagToOpen) {
 				var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 				if (!this.CombinePackages) {
-					this.CombinePackages = sap.ui.xmlfragment("CombinePackages", "com.9b.mrinv.view.fragments.CombinePackages", this);
+					this.CombinePackages = sap.ui.xmlfragment("CombinePackages", "com.9b.mrInv.view.fragments.CombinePackages", this);
 					this.getView().addDependent(this.CombinePackages);
 				}
 				sap.ui.core.Fragment.byId("CombinePackages", "combinePacknewItem").setValue("");
@@ -4065,7 +4066,7 @@ sap.ui.define([
 							that.createBatchCall(batchUrl, function () {
 								jsonModel.setProperty("/busyView", false);
 								that.CombinePackages.setBusy(false);
-								that.getView().byId("ManageRInvTable").clearSelection();
+								that.getView().byId("mrInvTable").clearSelection();
 								that.loadMasterData();
 								that.CombinePackages.close();
 							}, that.CombinePackages);
@@ -4077,7 +4078,7 @@ sap.ui.define([
 						this.createBatchCall(batchUrl, function () {
 							jsonModel.setProperty("/busyView", false);
 							that.CombinePackages.setBusy(false);
-							that.getView().byId("ManageRInvTable").clearSelection();
+							that.getView().byId("mrInvTable").clearSelection();
 							that.loadMasterData();
 							that.CombinePackages.close();
 						}, this.CombinePackages);
@@ -4106,13 +4107,13 @@ sap.ui.define([
 			if (customData.length > 0 && customData[0].getKey() === "DAYS") {
 				var sValue = evt.getParameter("value");
 				var filters = [new sap.ui.model.Filter("U_NLQTY", "EQ", sValue)];
-				this.byId("ManageRInvTable").getBinding("rows").filter(filters);
+				this.byId("mrInvTable").getBinding("rows").filter(filters);
 			}
 		},
 
 		/** Method for clear all filters**/
 		removefilters: function () {
-			var filterTable = this.getView().byId("ManageRInvTable");
+			var filterTable = this.getView().byId("mrInvTable");
 			var aColumns = filterTable.getColumns();
 			for (var i = 0; i <= aColumns.length; i++) {
 				filterTable.filter(aColumns[i], null);
@@ -4122,7 +4123,7 @@ sap.ui.define([
 		},
 		clearAllFilters: function () {
 			this.removefilters();
-			this.getView().byId("ManageRInvTable").clearSelection();
+			this.getView().byId("mrInvTable").clearSelection();
 		},
 		/*method start for create lab sample*/
 		oncreateLabDelete: function (evt) {
@@ -4159,19 +4160,19 @@ sap.ui.define([
 			var deviceModel = this.getView().getModel("device");
 			var isPhone = deviceModel.getProperty("/system/phone");
 			if (!this.createLabSampleDialog) {
-				this.createLabSampleDialog = sap.ui.xmlfragment("createLabSampleDialog", "com.9b.mrinv.view.fragments.CreateLabSample",
+				this.createLabSampleDialog = sap.ui.xmlfragment("createLabSampleDialog", "com.9b.mrInv.view.fragments.CreateLabSample",
 					this);
 				this.getView().addDependent(this.createLabSampleDialog);
 			}
 			var sArrayObj = [];
 
-			var harvestTable = this.byId("ManageRInvTable");
+			var harvestTable = this.byId("mrInvTable");
 			if (harvestTable.getSelectedIndices().length === 0) {
 				sap.m.MessageToast.show("Please select a batch");
 				return;
 			} else {
 				var sItems;
-				var table = this.getView().byId("ManageRInvTable");
+				var table = this.getView().byId("mrInvTable");
 				sItems = table.getSelectedIndices();
 				$.each(sItems, function (i, e) {
 					sObj = table.getContextByIndex(e).getObject();
@@ -4399,7 +4400,7 @@ sap.ui.define([
 						that.createLabSampleDialog.setBusy(false);
 						that.createLabSampleDialog.close();
 						sap.m.MessageToast.show("Lab sample created successfully");
-						that.byId("ManageRInvTable").clearSelection();
+						that.byId("mrInvTable").clearSelection();
 						// that.createLabSampleDialog.setBusy(false);			
 					}
 				}.bind(that), payLoadInventory, "POST");
@@ -4432,7 +4433,7 @@ sap.ui.define([
 			var exportData = [];
 			var that = this;
 
-			var table = this.getView().byId("ManageRInvTable");
+			var table = this.getView().byId("mrInvTable");
 			if (table.getSelectedIndices().length > 0) {
 				$.each(table.getSelectedIndices(), function (i, e) {
 					var obj = table.getContextByIndex(e).getObject();
@@ -4463,8 +4464,8 @@ sap.ui.define([
 		handleFinish: function (evt) {
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 			var sItems;
-			var ManageRInvTable = this.getView().byId("ManageRInvTable");
-			sItems = ManageRInvTable.getSelectedIndices();
+			var mrInvTable = this.getView().byId("mrInvTable");
+			sItems = mrInvTable.getSelectedIndices();
 			//var cDate = this.convertUTCDate(new Date());
 			var metrcData = jsonModel.getProperty("/metrcData");
 			var that = this;
@@ -4474,7 +4475,7 @@ sap.ui.define([
 			this.getView().setBusy(true);
 			$.each(sItems, function (i, e) {
 				var updateObject;
-				updateObject = ManageRInvTable.getContextByIndex(e).getObject();
+				updateObject = mrInvTable.getContextByIndex(e).getObject();
 				if (updateObject.Quantity === 0) {
 					updateArray.push(updateObject);
 					metrcPayLoadObj = {
@@ -4503,7 +4504,7 @@ sap.ui.define([
 									count--;
 									if (count == 0) {
 										that.getView().setBusy(false);
-										that.getView().byId("ManageRInvTable").clearSelection();
+										that.getView().byId("mrInvTable").clearSelection();
 										// setTimeout(function () {
 										that.loadMasterData();
 										// }, 1000);
@@ -4524,7 +4525,7 @@ sap.ui.define([
 								count--;
 								if (count == 0) {
 									that.getView().setBusy(false);
-									that.getView().byId("ManageRInvTable").clearSelection();
+									that.getView().byId("mrInvTable").clearSelection();
 									// setTimeout(function () {
 									that.loadMasterData();
 									// }, 1000);
@@ -4593,13 +4594,13 @@ sap.ui.define([
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 			var sItems;
 			this.loadLocationsDataInPkg();
-			var table = this.getView().byId("ManageRInvTable");
+			var table = this.getView().byId("mrInvTable");
 			sItems = table.getSelectedIndices();
 			this.loadItemData();
 			var allItemsList = jsonModel.getProperty("/allItemsList");
 			if (sItems.length > 0) {
 				if (!this.adjustQtyDialog) {
-					this.adjustQtyDialog = sap.ui.xmlfragment("adjustQty", "com.9b.mrinv.view.fragments.AdjustQuantity",
+					this.adjustQtyDialog = sap.ui.xmlfragment("adjustQty", "com.9b.mrInv.view.fragments.AdjustQuantity",
 						this);
 					this.getView().addDependent(this.adjustQtyDialog);
 				}
@@ -4826,7 +4827,7 @@ sap.ui.define([
 								that.adjustQtyDialog.close();
 								that.adjustQtyDialog.setBusy(false);
 								sap.m.MessageToast.show("Package(s) adjusted successfully");
-								that.getView().byId("ManageRInvTable").clearSelection();
+								that.getView().byId("mrInvTable").clearSelection();
 							}
 						}, payLoadInventoryExit, "POST");
 
@@ -4849,7 +4850,7 @@ sap.ui.define([
 								that.adjustQtyDialog.close();
 								that.adjustQtyDialog.setBusy(false);
 								sap.m.MessageToast.show("Package(s) adjusted successfully");
-								that.getView().byId("ManageRInvTable").clearSelection();
+								that.getView().byId("mrInvTable").clearSelection();
 							}
 						}, payLoadInventoryEntry, "POST");
 						// that.loadMasterData();
@@ -4866,7 +4867,7 @@ sap.ui.define([
 		},
 
 		handleRowSelection: function (evt) {
-			var PlannerTable = this.getView().byId("ManageRInvTable");
+			var PlannerTable = this.getView().byId("mrInvTable");
 			var arr = [];
 			if (evt.getParameter("rowContext")) {
 				var jsonModel = this.getOwnerComponent().getModel("jsonModel");
@@ -4953,7 +4954,7 @@ sap.ui.define([
 		handlemarkasMother: function () {
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 			var sItems;
-			var table = this.getView().byId("ManageRInvTable");
+			var table = this.getView().byId("mrInvTable");
 			var sArrayObj = [];
 			sItems = table.getSelectedIndices();
 			var licenseNo = jsonModel.getProperty("/selectedLicense");
@@ -4976,11 +4977,153 @@ sap.ui.define([
 				jsonModel.setProperty("/errorTxt", []);
 				this.createBatchCall(batchUrl, function () {
 					sap.m.MessageToast.show("Batches moved to mother succsessfully");
-					that.byId("ManageRInvTable").setSelectedIndex(-1);
+					that.byId("mrInvTable").setSelectedIndex(-1);
 					that.loadMasterData();
 				});
 			} else {
 				sap.m.MessageToast.show("Please select atleast one batch");
+			}
+		},
+		viewRetailIds: function (evt) {
+			var sObj = evt.getSource().getParent().getBindingContext("jsonModel").getObject();
+			var metrcUID = sObj.METRCUID;
+			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
+			var that = this;
+			var filters = "?$filter=U_PACKAGETAG eq " + "'" + metrcUID + "'";
+			this.readServiecLayer("/b1s/v2/RETAILID" + filters, function (data) {
+				jsonModel.setProperty("/mainList", data.value);
+				if (data.value.length > 0) {
+					var oDialog = new sap.m.TableSelectDialog({
+						title: "Retail IDs (" + data.value.length + ")",
+						multiSelect: false, // set to true if multiple selection is needed
+						columns: [
+							new sap.m.Column({
+								header: new sap.m.Label({
+									text: "Retail ID"
+								})
+							}),
+							new sap.m.Column({
+								header: new sap.m.Label({
+									text: "Package Tag"
+								})
+							})
+						],
+						items: {
+							path: "jsonModel>/mainList",
+							template: new sap.m.ColumnListItem({
+								cells: [
+									new sap.m.Text({
+										text: "{jsonModel>RetailID}"
+									}),
+									new sap.m.Text({
+										text: "{jsonModel>U_PACKAGETAG}"
+									})
+								]
+							})
+						},
+						cancel: function () {
+							console.log("Dialog cancelled");
+						}
+					}).addStyleClass("sapUiSizeCompact");
+					oDialog.setModel(jsonModel2);
+					oDialog.open();
+				} else {
+					sap.m.MessageToast.show("No Retail IDs are available for the selected METRC UID");
+				}
+			});
+
+		},
+		onListSearch: function (oEvent) {
+			var oTableSearchState = [],
+				sQuery = oEvent.getParameter("query");
+			if (sQuery && sQuery.length > 0) {
+				oTableSearchState = [
+					new Filter("U_RETAILIDURL", FilterOperator.Contains, sQuery, false)
+				];
+				var combinedFilter = new Filter({
+					filters: oTableSearchState,
+					and: false
+				});
+				this.getView().byId("idProductsTable").getBinding("rows").filter([combinedFilter]);
+			} else {
+				this.getView().byId("idProductsTable").getBinding("rows").filter([]);
+			}
+			/*	var count = this.byId("idProductsTable").getBinding("rows").iLength;
+				var totalCount = this.byId("idProductsTable").getBinding("rows").oList.length;
+				this.byId("listHeader").setText("Items (" + count + "/" + totalCount + ")");*/
+		},
+		handleNewRetailID: function () {
+			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
+			var mrInvTable = this.getView().byId("mrInvTable");
+			var sObj = mrInvTable.getContextByIndex(mrInvTable.getSelectedIndex()).getObject();
+			jsonModel.setProperty("/sMETRCUID", sObj.METRCUID);
+			if (!this.newRetailID) {
+				this.newRetailID = sap.ui.xmlfragment("retailID",
+					"com.9b.mrInv.view.fragments.NewRetailID", this);
+				this.getView().addDependent(this.newRetailID);
+			}
+			this.newRetailID.open();
+			jsonModel.setProperty("/selectedRIDs", [{
+				key: ""
+			}])
+
+		},
+		addRetailRows: function () {
+			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
+			var selectedRIDs = jsonModel.getProperty("/selectedRIDs");
+			selectedRIDs.push({
+				key: ""
+			});
+			jsonModel.setProperty("/selectedRIDs", selectedRIDs);
+		},
+		confirmCancelRetailID: function () {
+			this.newRetailID.close();
+		},
+
+		confirmPostRetailID: function () {
+			var jsonModel = this.getView().getModel("jsonModel");
+			var selectedRIDs = jsonModel.getProperty("/selectedRIDs");
+			var sMETRCUID = jsonModel.getProperty("/sMETRCUID");
+			var hasKeyValue = selectedRIDs.some(obj => obj.key !== "");
+			if (hasKeyValue) {
+				var sUrl, baseUrl, sPath, batchUrl = [],
+					jsonArr = [];
+				sUrl = new URL(itemData.Eaches[0]);
+				baseUrl = `${sUrl.protocol}//${sUrl.hostname}`;
+				$.each(itemData.Eaches, function (i, e) {
+					sUrl = new URL(e);
+					sPath = sUrl.pathname;
+					jsonArr.push(sPath);
+				});
+				var objRetailId = {
+					U_RETAILID: baseUrl,
+					U_PACKAGETAG: tag,
+					U_RETAILIDURL: JSON.stringify(jsonArr)
+				};
+				batchUrl.push({
+					url: "/b1s/v2/RETAILID",
+					data: objRetailId,
+					method: "POST"
+				});
+
+				that.createBatchCall(batchUrl, function () {
+					var errorTxt = jsonModel.getProperty("/errorTxt");
+					if (errorTxt == "" || errorTxt == null) {
+						sap.m.MessageToast.show("Data posted successfully");
+						that.byId("dynamicPageId").setBusy(false);
+						jsonModel.setProperty("/rId", "");
+						that.loadMasterData();
+
+					} else {
+						that.byId("dynamicPageId").setBusy(false);
+						jsonModel.setProperty("/rId", "");
+						jsonModel.setProperty("/errorTxt", "");
+
+					}
+
+				});
+			} else {
+				sap.m.MessageToast.show("Please scan or enter at least one Retail ID to proceed.");
 			}
 		}
 
