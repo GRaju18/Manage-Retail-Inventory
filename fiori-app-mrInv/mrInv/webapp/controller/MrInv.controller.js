@@ -4991,10 +4991,22 @@ sap.ui.define([
 			var that = this;
 			var filters = "?$filter=U_PACKAGETAG eq " + "'" + metrcUID + "'";
 			this.readServiecLayer("/b1s/v2/RETAILID" + filters, function (data) {
-				jsonModel.setProperty("/mainList", data.value);
 				if (data.value.length > 0) {
+					var rData = [];
+					var rURl = data.value[0].U_RETAILIDURL;
+					rURl = JSON.parse(rURl);
+					rURl.forEach(function (rIds) {
+						rData.push({
+							RetailID: data.value[0].U_RETAILID + rIds,
+							U_PACKAGETAG: data.value[0].U_PACKAGETAG
+						});
+					});
+					var jsonModel2 = new sap.ui.model.json.JSONModel();
+					jsonModel2.setData(rData);
+
 					var oDialog = new sap.m.TableSelectDialog({
-						title: "Retail IDs (" + data.value.length + ")",
+						contentWidth:"50%",
+						title: "Retail IDs (" + rData.length + ")",
 						multiSelect: false, // set to true if multiple selection is needed
 						columns: [
 							new sap.m.Column({
@@ -5009,14 +5021,14 @@ sap.ui.define([
 							})
 						],
 						items: {
-							path: "jsonModel>/mainList",
+							path: "/",
 							template: new sap.m.ColumnListItem({
 								cells: [
 									new sap.m.Text({
-										text: "{jsonModel>RetailID}"
+										text: "{RetailID}"
 									}),
 									new sap.m.Text({
-										text: "{jsonModel>U_PACKAGETAG}"
+										text: "{U_PACKAGETAG}"
 									})
 								]
 							})
@@ -5064,8 +5076,9 @@ sap.ui.define([
 			}
 			this.newRetailID.open();
 			jsonModel.setProperty("/selectedRIDs", [{
-				key: ""
-			}])
+					key: ""
+				}]),
+				this.getMETRCRetailID();
 
 		},
 		addRetailRows: function () {
@@ -5079,25 +5092,71 @@ sap.ui.define([
 		confirmCancelRetailID: function () {
 			this.newRetailID.close();
 		},
-
-		confirmPostRetailID: function () {
+		getMETRCRetailID: function () {
 			var jsonModel = this.getView().getModel("jsonModel");
+			var license = jsonModel.getProperty("/selectedLicense");
+			var rId = jsonModel.getProperty("/sMETRCUID");
+			var mainData = jsonModel.getProperty("/packagesData");
+			/*	$.each(mainData, function (i, e) {
+					if (rId == e.METRCUID) {
+						sameTagPresent = false;
+						sap.m.MessageToast.show("Tag imported already");
+						jsonModel.setProperty("/sMETRCUID", "");
+						return;
+					}
+				});*/
+
+			var that = this;
+			var metrcUrl = "/retailid/v2/receive/" + rId + "?licenseNumber=" + license;
+			this.callMetricsGETService2(metrcUrl, function (itemData) {
+				if (itemData && itemData.Eaches && itemData.Eaches.length > 0) {
+					jsonModel.setProperty("/mRetailData", itemData.Eaches);
+				} else {
+					sap.m.MessageToast.show("Data not found for this tag");
+				}
+
+			}, function (error) {
+				that.getView().setBusy(false);
+				sap.m.MessageToast.show(JSON.stringify(error));
+			});
+
+		},
+		validateRetailID: function (oEvent) {
+			var sId = oEvent.getParameter("value").trim(); // trim spaces
+			var oInput = oEvent.getSource();
+			var oJsonModel = this.getView().getModel("jsonModel");
+			var aRetailData = oJsonModel.getProperty("/mRetailData") || [];
+			// check if ID exists in array
+			var bExists = aRetailData.includes(sId);
+
+			if (!bExists) {
+				oInput.setValueState("Error");
+				oInput.setValueStateText("Invalid Retail ID");
+			} else {
+				oInput.setValueState("None");
+				oInput.setValueStateText(""); // reset text
+			}
+		},
+
+		confirmPostRetailID: function (itemData) {
+			var jsonModel = this.getView().getModel("jsonModel");
+			var that = this;
 			var selectedRIDs = jsonModel.getProperty("/selectedRIDs");
+			var hasKeyValue = selectedRIDs.some(obj => obj.key !== "" && obj.valueState == "None");
 			var sMETRCUID = jsonModel.getProperty("/sMETRCUID");
-			var hasKeyValue = selectedRIDs.some(obj => obj.key !== "");
 			if (hasKeyValue) {
 				var sUrl, baseUrl, sPath, batchUrl = [],
 					jsonArr = [];
-				sUrl = new URL(itemData.Eaches[0]);
+				sUrl = new URL(selectedRIDs[0].key);
 				baseUrl = `${sUrl.protocol}//${sUrl.hostname}`;
-				$.each(itemData.Eaches, function (i, e) {
-					sUrl = new URL(e);
+				$.each(selectedRIDs, function (i, e) {
+					sUrl = new URL(e.key);
 					sPath = sUrl.pathname;
 					jsonArr.push(sPath);
 				});
 				var objRetailId = {
 					U_RETAILID: baseUrl,
-					U_PACKAGETAG: tag,
+					U_PACKAGETAG: sMETRCUID,
 					U_RETAILIDURL: JSON.stringify(jsonArr)
 				};
 				batchUrl.push({
@@ -5105,27 +5164,22 @@ sap.ui.define([
 					data: objRetailId,
 					method: "POST"
 				});
-
-				that.createBatchCall(batchUrl, function () {
+				jsonModel.setProperty("/busyView", true);
+				this.createBatchCall(batchUrl, function () {
+					jsonModel.setProperty("/busyView", false);
+					that.newRetailID.close();
 					var errorTxt = jsonModel.getProperty("/errorTxt");
 					if (errorTxt == "" || errorTxt == null) {
 						sap.m.MessageToast.show("Data posted successfully");
-						that.byId("dynamicPageId").setBusy(false);
-						jsonModel.setProperty("/rId", "");
+						jsonModel.setProperty("/sMETRCUID", "");
 						that.loadMasterData();
-
 					} else {
-						that.byId("dynamicPageId").setBusy(false);
-						jsonModel.setProperty("/rId", "");
+						jsonModel.setProperty("/sMETRCUID", "");
 						jsonModel.setProperty("/errorTxt", "");
-
 					}
 
 				});
-			} else {
-				sap.m.MessageToast.show("Please scan or enter at least one Retail ID to proceed.");
 			}
 		}
-
 	});
 });

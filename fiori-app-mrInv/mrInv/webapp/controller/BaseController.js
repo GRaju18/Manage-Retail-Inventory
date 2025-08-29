@@ -1739,7 +1739,45 @@ sap.ui.define([
 			var resPop = this.getView().byId("resPop");
 			this.oMessageView.navigateBack();
 			resPop.firePress();
-		}
+		},
+		callMetricsGETService2                        : function (entity, success, error) {
+			var that = this;
+			// var obj = this.getView().getModel("jsonModel").getProperty("/selectedMetrics");
+			var metricConfig = this.getView().getModel("jsonModel").getProperty("/metricConfig");
+			$.ajax({
+				type: "GET",
+				async: false,
+				url: metricConfig.BaseUrl + entity,
+				contentType: "application/json",
+				headers: {
+					"Authorization": "Basic " + btoa(metricConfig.UserName + ":" + metricConfig.Password)
+				},
+				success: function (sRes) {
+					success.call(that, sRes);
+				},
+				error: function (eRes) {
+					var errorMsg = "";
+					if (eRes.responseJSON && eRes.responseJSON.length > 0) {
+						$.each(eRes.responseJSON, function (i, e) {
+							errorMsg = errorMsg + e.message + "\n";
+							that.popUpData(e.message, "E");
+						});
+					} else if (eRes.responseJSON && eRes.responseJSON.Message) {
+						errorMsg = eRes.responseJSON.Message;
+						that.popUpData(errorMsg, "E");
+					} else if (eRes.statusText && eRes.status === 401) {
+						errorMsg = "Unauthorized";
+						that.popUpData(errorMsg, "E");
+					} else if (eRes.statusText) {
+						errorMsg = eRes.statusText;
+						that.popUpData(errorMsg, "E");
+					}
+
+					error.call(that, errorMsg);
+					sap.m.MessageToast.show(errorMsg);
+				}
+			});
+		},
 
 	});
 });

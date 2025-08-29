@@ -45,7 +45,7 @@ sap.ui.define([
 			this.setModel(appModel, "appModel");
 
 			var jsonModel = new JSONModel({
-				versionInfo: "v1.124.47",
+				versionInfo: "v1.124.48",
 				strainList: [],
 				createMode: false,
 				serLayerbaseUrl: "https://ghdev.seedandbeyond.com:50000",
@@ -53,6 +53,11 @@ sap.ui.define([
 					"CompanyDB": "__QAS",
 					"UserName": "aag11163",
 					"Password": "#!GLaSs@HoUsE!#910174!#"
+				},
+				metricConfig: {
+					"BaseUrl": "https://api-ca.metrc.com",
+					"UserName": "5KUYWFY7KkyYFKVsgWSoftC-Telko1K-HkElxBDicTxlvwTk",
+					"Password": "yNjM-t5RJHfaH-Bmy6tNH4dluG45d5TRnyjpudOGAREDlUos"
 				},
 
 				//set the app navigation URL model

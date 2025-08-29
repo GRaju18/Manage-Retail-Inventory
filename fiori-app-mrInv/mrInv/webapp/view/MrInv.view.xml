@@ -124,7 +124,7 @@
 						<table:Column width="10%" sortProperty="CreateTime" filterProperty="CreateTime" tooltip="CreateTime">
 							<Label text="" design="Bold"/>
 							<table:template>
-								<Button text="Retail Ids" press="viewRetailIds" type="Transparent" visible="{=${jsonModel>U_RETAILIDURL} === null ? false : true}"/>
+								<Button text="Retail IDs" press="viewRetailIds" type="Transparent" visible="{=${jsonModel>U_RETAILIDURL} === null ? false : true}"/>
 							</table:template>
 						</table:Column>
 					</table:columns>
