@@ -2241,11 +2241,11 @@ sap.ui.define([
 							return nItem;
 						}
 					});
-					if (rObj.length > 0) {
-						sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue(rObj[0].SalesEmployeeName);
-					} else {
-						sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue(batchDetailsObj.IntrSerial.split("- -")[0].trimEnd());
-					}
+					/*	if (rObj.length > 0) {
+							sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue(rObj[0].SalesEmployeeName);
+						} else {
+							sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue(batchDetailsObj.IntrSerial.split("- -")[0].trimEnd());
+						}*/
 				} else if (batchDetailsObj.IntrSerial != null && batchDetailsObj.IntrSerial.includes("-") == true) {
 					rObj = $.grep(data1.value, function (nItem) {
 
@@ -2257,14 +2257,15 @@ sap.ui.define([
 							return nItem;
 						}
 					});
-					if (rObj.length > 0) {
-						sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue(rObj[0].SalesEmployeeName);
-					} else {
-						sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue(batchDetailsObj.IntrSerial.split("-")[0].trimEnd());
-					}
-				} else {
-					sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue("");
+					/*	if (rObj.length > 0) {
+							sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue(rObj[0].SalesEmployeeName);
+						} else {
+							sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue(batchDetailsObj.IntrSerial.split("-")[0].trimEnd());
+						}*/
 				}
+				/*else {
+					sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue("");
+				}*/
 
 			});
 		},
@@ -2401,14 +2402,11 @@ sap.ui.define([
 			sItems = table.getSelectedIndices();
 			if (sItems.length > 0) {
 				if (!this.batchDetailsDialog) {
-					this.batchDetailsDialog = sap.ui.xmlfragment("batchDetailsDialog", "com.9b.mrInv.view.fragments.BatchDetails", this);
+					this.batchDetailsDialog = sap.ui.xmlfragment("batchDetailsDialog", "com.9b.mrInv.view.fragments.BatchDetailsNew", this);
 					this.getView().addDependent(this.batchDetailsDialog);
 				}
 
 				var updateObject = table.getContextByIndex(sItems).getObject();
-				sap.ui.core.Fragment.byId("batchDetailsDialog", "microId").setSelectedKey(updateObject.U_Micro);
-				sap.ui.core.Fragment.byId("batchDetailsDialog", "priceTier").setSelectedKey(updateObject.U_PriceTier);
-				sap.ui.core.Fragment.byId("batchDetailsDialog", "allocationId").setSelectedKey(updateObject.U_Allocation);
 				this._initialStates = {
 					U_Yellowhead: updateObject.U_Yellowhead,
 					U_Bottoms: updateObject.U_Bottoms,
@@ -2420,7 +2418,9 @@ sap.ui.define([
 					U_Glass: updateObject.U_Glass,
 					IntrSerial: updateObject.IntrSerial,
 					U_SalesNote: updateObject.U_SalesNote,
-					U_Sourced: updateObject.U_Sourced
+					U_Sourced: updateObject.U_Sourced,
+					U_THC: updateObject.U_THC,
+					U_CBD: updateObject.U_CBD,
 				};
 
 				var batchDetailsObj = {
@@ -2453,9 +2453,10 @@ sap.ui.define([
 					newQty: "",
 					sItem: "",
 					U_SalesNote: updateObject.U_SalesNote,
-					ItemName: updateObject.ItemName
+					ItemName: updateObject.ItemName,
+					U_THC: updateObject.U_THC,
+					U_CBD: updateObject.U_CBD,
 				};
-				sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").setValue("");
 
 				if ((updateObject.IntrSerial != null || updateObject.IntrSerial != undefined) && updateObject.IntrSerial.includes("- -") ==
 					true) {
@@ -2491,12 +2492,12 @@ sap.ui.define([
 			var that = this;
 			var jsonModel = this.getView().getModel("jsonModel");
 			var batchDetailsObj = jsonModel.getProperty("/batchDetailsObj");
-			var salesPerson = sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").getValue();
-			var priceTier = sap.ui.core.Fragment.byId("batchDetailsDialog", "priceTier").getValue();
-			var floorPrice = sap.ui.core.Fragment.byId("batchDetailsDialog", "floorPrice").getValue();
-			var potencyId = sap.ui.core.Fragment.byId("batchDetailsDialog", "potencyId").getValue();
-			var gMicro = sap.ui.core.Fragment.byId("batchDetailsDialog", "microId").getSelectedKey();
-			var allocation = sap.ui.core.Fragment.byId("batchDetailsDialog", "allocationId").getSelectedKey();
+			/*	var salesPerson = sap.ui.core.Fragment.byId("batchDetailsDialog", "sRepo").getValue();
+				var priceTier = sap.ui.core.Fragment.byId("batchDetailsDialog", "priceTier").getValue();
+				var floorPrice = sap.ui.core.Fragment.byId("batchDetailsDialog", "floorPrice").getValue();
+				var potencyId = sap.ui.core.Fragment.byId("batchDetailsDialog", "potencyId").getValue();
+				var gMicro = sap.ui.core.Fragment.byId("batchDetailsDialog", "microId").getSelectedKey();
+				var allocation = sap.ui.core.Fragment.byId("batchDetailsDialog", "allocationId").getSelectedKey();*/
 
 			var isValtidate = true;
 
@@ -2520,9 +2521,9 @@ sap.ui.define([
 				this.batchDetailsDialog.setBusy(true);
 				// var patchPayload = {};
 
-				var arttribute2 = salesPerson + " - $" + batchDetailsObj.IntrSerialPrice;
+				//	var arttribute2 = salesPerson + " - $" + batchDetailsObj.IntrSerialPrice;
 				var patchPayload = {
-					"BatchAttribute2": arttribute2, //batchDetailsObj.IntrSerial,
+					//	"BatchAttribute2": arttribute2, //batchDetailsObj.IntrSerial,
 					"U_Yellowhead": batchDetailsObj.U_Yellowhead,
 					"U_Bottoms": batchDetailsObj.U_Bottoms,
 					"U_PM": batchDetailsObj.U_PM,
@@ -2532,37 +2533,12 @@ sap.ui.define([
 					"U_SeedBana": batchDetailsObj.U_SeedBana,
 					"U_Glass": batchDetailsObj.U_Glass,
 					"U_Sourced": batchDetailsObj.U_Sourced,
-					"U_PriceTier": priceTier,
-					"U_Micro": gMicro,
-					"U_Allocation": allocation,
-					"U_Potency": potencyId,
-					"U_FloorPrice": floorPrice,
-					"U_SalesNote": batchDetailsObj.U_SalesNote
+					"U_THC": batchDetailsObj.U_THC,
+					"U_CBD": batchDetailsObj.U_CBD
+
 				};
 
-				if (salesPerson == "" || salesPerson == undefined) {
-					delete patchPayload.BatchAttribute2;
-				}
-
-				if (priceTier == "" || priceTier == undefined) {
-					delete patchPayload.U_PriceTier;
-				}
-
-				if (gMicro == "" || gMicro == undefined) {
-					delete patchPayload.U_Micro;
-				}
-
-				if (allocation == "" || allocation == undefined) {
-					delete patchPayload.U_Allocation;
-				}
-
-				if (potencyId == "" || potencyId == undefined) {
-					delete patchPayload.U_Potency;
-				}
-
-				if (floorPrice == "" || floorPrice == undefined) {
-					delete patchPayload.U_FloorPrice;
-				}
+				
 
 				that.updateServiecLayer("/b1s/v2/BatchNumberDetails(" + batchDetailsObj.BatchAbsEntry + ")", function (res) {
 					that.batchDetailsDialog.setBusy(false);
@@ -5005,7 +4981,7 @@ sap.ui.define([
 					jsonModel2.setData(rData);
 
 					var oDialog = new sap.m.TableSelectDialog({
-						contentWidth:"50%",
+						contentWidth: "50%",
 						title: "Retail IDs (" + rData.length + ")",
 						multiSelect: false, // set to true if multiple selection is needed
 						columns: [

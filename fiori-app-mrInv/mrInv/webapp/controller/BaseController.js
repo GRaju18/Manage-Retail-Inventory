@@ -131,7 +131,7 @@ sap.ui.define([
 			if (Number(sQty) + Number(aQty) < 0) {
 				sap.m.MessageToast.show("Adjust Quantity is Less than Available Quantity");
 				sObj.STATUSAdjust = "Error";
-				sObj.STATUSTEXTAdjust="Adjust Quantity is Less than Available Quantity";
+				sObj.STATUSTEXTAdjust = "Adjust Quantity is Less than Available Quantity";
 			} else {
 				sObj.STATUSAdjust = "None";
 				sObj.STATUSTEXTAdjust = "";
@@ -277,7 +277,7 @@ sap.ui.define([
 			sap.ui.core.Fragment.byId(fId, search).setValue();
 			sap.ui.core.Fragment.byId(fId, table).getBinding("items").filter([]);
 		},
-		
+
 		// loadLicenseData: function () {
 		// 	var that = this;
 		// 	var filters = [];
@@ -290,7 +290,7 @@ sap.ui.define([
 		// 		}
 		// 	});
 		// },
-		
+
 		convertUTCDate: function (date) {
 			date.setHours(new Date().getHours());
 			date.setMinutes(new Date().getMinutes());
@@ -1740,7 +1740,7 @@ sap.ui.define([
 			this.oMessageView.navigateBack();
 			resPop.firePress();
 		},
-		callMetricsGETService2                        : function (entity, success, error) {
+		callMetricsGETService2: function (entity, success, error) {
 			var that = this;
 			// var obj = this.getView().getModel("jsonModel").getProperty("/selectedMetrics");
 			var metricConfig = this.getView().getModel("jsonModel").getProperty("/metricConfig");

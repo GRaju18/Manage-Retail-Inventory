@@ -1,0 +1,27 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout">
+	<Dialog id="batchDetailsID" class="sapUiSizeCompact" draggable="true" busy="{jsonModel>/busyView}">
+		<customHeader>
+			<Bar>
+				<contentMiddle>
+					<Label text="Batch Details"/>
+				</contentMiddle>
+			</Bar>
+		</customHeader>
+		<content>
+			<FlexBox direction="Column">
+				<InputListItem label="THC%" width="15rem">
+					<Input type="Number" width="14rem" value="{jsonModel>/batchDetailsObj/U_THC}"/>
+				</InputListItem>
+				<InputListItem label="CBD%" width="15rem">
+					<Input type="Number" width="14rem" value="{jsonModel>/batchDetailsObj/U_CBD}"/>
+				</InputListItem>
+			</FlexBox>
+		</content>
+		<beginButton>
+			<Button type="Emphasized" text="Update" press="onconfirmBatchDetails"/>
+		</beginButton>
+		<endButton>
+			<Button type="Transparent" text="{i18n>Cancel}" press="onbatchDetailsClose"/>
+		</endButton>
+	</Dialog>
+</core:FragmentDefinition>

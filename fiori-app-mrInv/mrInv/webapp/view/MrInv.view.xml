@@ -51,7 +51,7 @@
 								liveChange="onChangeMultiInput" id="searchFieldTable" enableMultiLineMode="true"/>
 							<Button text="Clear All Filters" press="clearAllFilters"/>
 							<Text class="sapMTBSeparator"/>
-							<Button type="Default" press="handleNewRetailID" text="{i18n>newRetailID}"  enabled="{jsonModel>/batchDetailButton}"/>
+							<Button type="Default" press="handleNewRetailID" text="{i18n>newRetailID}" enabled="{jsonModel>/batchDetailButton}"/>
 							<Button type="Default" press="handleNewPackage" text="{i18n>NewPackage}"/>
 							<!--	<Button type="Default" press="handleCreateLabSample" text="{i18n>CreateLabSample}" visible="{jsonModel>/configData/V_CLS}"/>-->
 							<Button type="Default" press="handleInventoryTransfer" text="{i18n>InventaryTransfer}" visible="{jsonModel>/configData/V_CTR}"/>
@@ -79,7 +79,37 @@
 								<Text text="{jsonModel>ItemName}"/>
 							</table:template>
 						</table:Column>
-						<table:Column sortProperty="SourceUID" filterProperty="SourceUID" width="20%">
+						<table:Column sortProperty="ItemGroupName" filterProperty="ItemGroupName" width="20%">
+							<Label text="{i18n>ItemGrp}" design="Bold" wrapping="true"/>
+							<table:template>
+								<Text text="{jsonModel>ItemGroupName}"/>
+							</table:template>
+						</table:Column>
+						<table:Column sortProperty="ProdctType" filterProperty="ProdctType" width="20%">
+							<Label text="{i18n>ProductType}" design="Bold" wrapping="true"/>
+							<table:template>
+								<Text text="{jsonModel>ProdctType}"/>
+							</table:template>
+						</table:Column>
+						<table:Column sortProperty="Quantity" filterProperty="Quantity" defaultFilterOperator="EQ" width="10%">
+							<Label text="{i18n>Quantity}" design="Bold" wrapping="true"/>
+							<table:template>
+								<Text text="{jsonModel>Quantity}"/>
+							</table:template>
+						</table:Column>
+						<table:Column sortProperty="U_THC" filterProperty="U_THC" width="10%">
+							<Label text="{i18n>THC}" design="Bold" wrapping="true"/>
+							<table:template>
+								<Text text="{jsonModel>U_THC}"/>
+							</table:template>
+						</table:Column>
+						<table:Column sortProperty="U_CBD" filterProperty="U_CBD" width="10%">
+							<Label text="{i18n>CBD}" design="Bold" wrapping="true"/>
+							<table:template>
+								<Text text="{jsonModel>U_CBD}"/>
+							</table:template>
+						</table:Column>
+						<!--	<table:Column sortProperty="SourceUID" filterProperty="SourceUID" width="20%">
 							<Label text="{i18n>SourceUID}" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{jsonModel>SourceUID}"/>
@@ -96,7 +126,7 @@
 							<table:template>
 								<Text text="{jsonModel>BinLocationName}"/>
 							</table:template>
-						</table:Column>
+						</table:Column>-->
 						<!--	<table:Column sortProperty="U_NLBST" filterProperty="U_NLBST" width="10%">
 							<Label text="{i18n>LabStatus}" design="Bold"/>
 							<table:template>
@@ -109,18 +139,12 @@
 								<Text text="{path:'jsonModel>CreateDate',formatter:'.formatter.dateDisplay'}" wrapping="true"/>
 							</table:template>
 						</table:Column>
-						<table:Column sortProperty="Quantity" filterProperty="Quantity" defaultFilterOperator="EQ" width="10%">
-							<Label text="{i18n>Quantity}" design="Bold" wrapping="true"/>
-							<table:template>
-								<Text text="{jsonModel>Quantity}"/>
-							</table:template>
-						</table:Column>
-						<table:Column sortProperty="U_SalesNote" filterProperty="U_SalesNote" width="15%">
+						<!--	<table:Column sortProperty="U_SalesNote" filterProperty="U_SalesNote" width="15%">
 							<Label text="Sales Notes" design="Bold" wrapping="true"/>
 							<table:template>
 								<Text text="{jsonModel>U_SalesNote}"/>
 							</table:template>
-						</table:Column>
+						</table:Column>-->
 						<table:Column width="10%" sortProperty="CreateTime" filterProperty="CreateTime" tooltip="CreateTime">
 							<Label text="" design="Bold"/>
 							<table:template>

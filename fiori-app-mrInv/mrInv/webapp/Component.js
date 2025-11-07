@@ -45,14 +45,14 @@ sap.ui.define([
 			this.setModel(appModel, "appModel");
 
 			var jsonModel = new JSONModel({
-				versionInfo: "v1.124.48",
+				versionInfo: "v1.124.49",
 				strainList: [],
 				createMode: false,
-				serLayerbaseUrl: "https://ghdev.seedandbeyond.com:50000",
+				serLayerbaseUrl: "https://ghdev.seedandbeyond.com:20100",
 				userAuthPayload: {
-					"CompanyDB": "__QAS",
-					"UserName": "aag11163",
-					"Password": "#!GLaSs@HoUsE!#910174!#"
+					"CompanyDB": "DEV",
+					"UserName": "RajuG",
+					"Password": "AlliRaz@9"
 				},
 				metricConfig: {
 					"BaseUrl": "https://api-ca.metrc.com",
