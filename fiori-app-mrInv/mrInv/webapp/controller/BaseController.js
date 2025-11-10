@@ -233,6 +233,8 @@ sap.ui.define([
 						} else if (e.U_NFLDS === "Item Group Code") {
 							var itemGrpCodes = e.U_NVALUE;
 							jsonModel.setProperty("/itemGrpCodes", itemGrpCodes);
+							itemGrpCodemrInv = JSON.parse(itemGrpCodes);
+							jsonModel.setProperty("/itemGrpCodemrInv", itemGrpCodemrInv);
 						} else if (e.U_NFLDS === "Item groups") {
 							var itemGrpCodemrInv = e.U_NVALUE;
 							itemGrpCodemrInv = JSON.parse(itemGrpCodemrInv);

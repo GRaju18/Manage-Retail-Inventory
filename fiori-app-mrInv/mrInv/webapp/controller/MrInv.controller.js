@@ -393,9 +393,12 @@ sap.ui.define([
 			}
 			var filters = "?$filter=ItemsGroupCode eq " + dryCanGrpCode;
 			var fields = "&$select=" + ["ItemName", "ItemsGroupCode", "ItemCode", "InventoryUOM", "ProdStdCost"].join();
-			this.readServiecLayer("/b1s/v2/Items" + filters + fields, function (data1) {
-				jsonModel.setProperty("/itemCodeList", data1.value);
-			});
+			return new Promise(function (fnResolve, fnReject) {
+				this.readServiecLayer("/b1s/v2/Items" + filters + fields, function (data1) {
+					jsonModel.setProperty("/itemCodeList", data1.value);
+					return fnResolve(data1.value);
+				});
+			}.bind(this));
 			// var cloneItem = $.grep(itemGrpCodes, function (e) {
 			// 	if (e.text === "Clone") {
 			// 		return e;
@@ -412,11 +415,12 @@ sap.ui.define([
 			this.readServiecLayer("/b1s/v2/Items" + cloneFilters + cloneFields, function (data1) {
 				jsonModel.setProperty("/cloneItemCodeList", data1.value);
 			});
-
+			jsonModel.setProperty("/busyView", true);
 			var fieldsItem = "&$select=" + ["ItemName", "ItemsGroupCode", "ItemCode", "InventoryUOM", "ProdStdCost"].join();
 			var filterU_ISCANNABIS = "?$filter=U_ISCANNABIS eq 'Y'";
 			this.readServiecLayer("/b1s/v2/Items" + filterU_ISCANNABIS + fieldsItem, function (data1) {
 				jsonModel.setProperty("/allItemsList", data1.value);
+				jsonModel.setProperty("/busyView", false);
 			});
 		},
 
@@ -2538,8 +2542,6 @@ sap.ui.define([
 
 				};
 
-				
-
 				that.updateServiecLayer("/b1s/v2/BatchNumberDetails(" + batchDetailsObj.BatchAbsEntry + ")", function (res) {
 					that.batchDetailsDialog.setBusy(false);
 					that.loadMasterData();
@@ -3705,43 +3707,44 @@ sap.ui.define([
 				var itemCodeList;
 				jsonModel.setProperty("/NPDNMCode", "");
 				var itemGrpCodemrInv = jsonModel.getProperty("/itemGrpCodemrInv");
-				this.loadItemData();
-				itemCodeList = jsonModel.getProperty("/allItemsList");
-				$.each(sItems, function (i, e) {
-					sObj = mrInvTable.getContextByIndex(e).getObject();
-					sObj.STATUSQTY = "None";
-					sObj.U_NLABEL = "";
-					sObj.QTYTXT = "";
-					sObj.NQNTY = "";
-					sObj.tagCode = "";
-					sObj.NTRID = "";
-					sObj.NSTLN = "";
-					sObj.NSTLNCODE = "";
-					sObj.NPDNMText = "";
-					sObj.selectedItemKey = "";
-					//sObj.NPDNMCode = "";
-					sObj.SNO = "#" + (i + 1);
-					sObj.itemList = [];
-					countQty = countQty + sObj.Quantity;
-					sArrayObj.push(sObj);
-					batchData.push(sObj.METRCUID);
-				});
 
-				$.each(itemGrpCodemrInv, function (i, m) {
-					var rObj2 = $.grep(itemCodeList, function (item) {
-						if (item.ItemsGroupCode && m.key == item.ItemsGroupCode) {
-							arr.push(item);
-						}
+				this.loadItemData().then((itemCodeList) => {
+					$.each(sItems, function (i, e) {
+						sObj = mrInvTable.getContextByIndex(e).getObject();
+						sObj.STATUSQTY = "None";
+						sObj.U_NLABEL = "";
+						sObj.QTYTXT = "";
+						sObj.NQNTY = "";
+						sObj.tagCode = "";
+						sObj.NTRID = "";
+						sObj.NSTLN = "";
+						sObj.NSTLNCODE = "";
+						sObj.NPDNMText = "";
+						sObj.selectedItemKey = "";
+						//sObj.NPDNMCode = "";
+						sObj.SNO = "#" + (i + 1);
+						sObj.itemList = [];
+						countQty = countQty + sObj.Quantity;
+						sArrayObj.push(sObj);
+						batchData.push(sObj.METRCUID);
 					});
+					$.each(itemGrpCodemrInv, function (i, m) {
+						var rObj2 = $.grep(itemCodeList, function (item) {
+							if (item.ItemsGroupCode && m.key == item.ItemsGroupCode) {
+								arr.push(item);
+							}
+						});
+					});
+					jsonModel.setProperty("/combinePackagesItems", arr);
+					jsonModel.setProperty("/totalQtyCombinepack", countQty);
+
+					jsonModel.setProperty("/combinePackagesRow", sArrayObj);
+					if (sArrayObj.length > 0) {
+						this.getBatchNumbersAllocation(batchData).then(this.proceedToOpenCombiPkgDialog.bind(this));
+					} else {
+						sap.m.MessageToast.show("Please select a batch");
+					}
 				});
-				jsonModel.setProperty("/combinePackagesItems", arr);
-				jsonModel.setProperty("/totalQtyCombinepack", countQty);
-			}
-			jsonModel.setProperty("/combinePackagesRow", sArrayObj);
-			if (sArrayObj.length > 0) {
-				this.getBatchNumbersAllocation(batchData).then(this.proceedToOpenCombiPkgDialog.bind(this));
-			} else {
-				sap.m.MessageToast.show("Please select a batch");
 			}
 
 		},
