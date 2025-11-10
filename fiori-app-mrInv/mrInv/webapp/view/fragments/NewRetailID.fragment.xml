@@ -4,7 +4,7 @@
 		<content>
 			<List mode="None" items="{path:'jsonModel>/selectedRIDs'}" width="100%">
 				<CustomListItem>
-					<Input placeholder="Scan or enter Retail ID" value="{jsonModel>key}" valueState="{jsonModel>valueState}" width="100%" change="validateRetailID"/>
+					<Input placeholder="Scan or enter Retail ID" value="{jsonModel>key}" valueState="{jsonModel>valueState}" width="100%"/>
 				</CustomListItem>
 				<headerToolbar>
 					<OverflowToolbar>

@@ -350,7 +350,7 @@ sap.ui.define([
 				jsonModel.setProperty("/packagesData", mainArr);
 
 				that.getView().setBusy(false);
-				that.loadItemData();
+			//	that.loadItemData();
 
 				/*	setTimeout(function () {
 						var promises = [];
@@ -378,7 +378,7 @@ sap.ui.define([
 					}, 1000);*/
 			});
 		},
-		loadItemData: function () {
+		changeLocationItemData: function () {
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 			var itemGrpCodes = jsonModel.getProperty("/itemGrpCodes");
 			itemGrpCodes = JSON.parse(itemGrpCodes);
@@ -393,23 +393,13 @@ sap.ui.define([
 			}
 			var filters = "?$filter=ItemsGroupCode eq " + dryCanGrpCode;
 			var fields = "&$select=" + ["ItemName", "ItemsGroupCode", "ItemCode", "InventoryUOM", "ProdStdCost"].join();
-			return new Promise(function (fnResolve, fnReject) {
-				this.readServiecLayer("/b1s/v2/Items" + filters + fields, function (data1) {
-					jsonModel.setProperty("/itemCodeList", data1.value);
-					return fnResolve(data1.value);
-				});
-			}.bind(this));
-			// var cloneItem = $.grep(itemGrpCodes, function (e) {
-			// 	if (e.text === "Clone") {
-			// 		return e;
-			// 	}
-			// });
-			// var cloneItemKey = "";
-			// if (cloneItem.length > 0) {
-			// 	cloneItemKey = cloneItem[0].key;
-			// }
-			//var cloneFilters = "?$filter=ItemsGroupCode eq " + cloneItemKey;
 
+			this.readServiecLayer("/b1s/v2/Items" + filters + fields, function (data1) {
+				jsonModel.setProperty("/itemCodeList", data1.value);
+			});
+		},
+		loadItemData: function () {
+			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
 			var cloneFilters = "?$filter=(contains(ItemName,'Clone') or contains(ItemName,'Teen'))";
 			var cloneFields = "&$select=" + ["ItemName", "ItemsGroupCode", "ItemCode", "InventoryUOM", "ProdStdCost"].join();
 			this.readServiecLayer("/b1s/v2/Items" + cloneFilters + cloneFields, function (data1) {
@@ -418,10 +408,13 @@ sap.ui.define([
 			jsonModel.setProperty("/busyView", true);
 			var fieldsItem = "&$select=" + ["ItemName", "ItemsGroupCode", "ItemCode", "InventoryUOM", "ProdStdCost"].join();
 			var filterU_ISCANNABIS = "?$filter=U_ISCANNABIS eq 'Y'";
-			this.readServiecLayer("/b1s/v2/Items" + filterU_ISCANNABIS + fieldsItem, function (data1) {
-				jsonModel.setProperty("/allItemsList", data1.value);
-				jsonModel.setProperty("/busyView", false);
-			});
+			return new Promise(function (fnResolve, fnReject) {
+				this.readServiecLayer("/b1s/v2/Items" + filterU_ISCANNABIS + fieldsItem, function (data1) {
+					jsonModel.setProperty("/allItemsList", data1.value);
+					jsonModel.setProperty("/busyView", false);
+					return fnResolve(data1.value);
+				});
+			}.bind(this));
 		},
 
 		/*Methods for multiInput for sarch field for scan functionality start*/
@@ -592,6 +585,7 @@ sap.ui.define([
 			this.readServiecLayer("/b1s/v2/BinLocations" + filters + fields, function (data) {
 				jsonModel.setProperty("/ChangeLocationList", data.value);
 			});
+			this.changeLocationItemData();
 		},
 
 		onChangeLocTemApply: function () {
@@ -3163,52 +3157,53 @@ sap.ui.define([
 				var sItems;
 				var table = this.getView().byId("mrInvTable");
 				sItems = table.getSelectedIndices();
-				$.each(sItems, function (i, e) {
-					sObj = table.getContextByIndex(e).getObject();
-					sObj.STATUSQTY = "None";
-					sObj.U_NLABEL = "";
-					sObj.QTYTXT = "";
-					sObj.NQNTY = "";
-					sObj.tagCode = "";
-					sObj.NTRID = "";
-					sObj.NSTLN = "";
-					sObj.NSTLNCODE = "";
-					sObj.NPDNMText = "";
-					sObj.selectedItemKey = "";
-					//sObj.NPDNMCode = "";
-					sObj.SNO = "#" + (i + 1);
-					sObj.itemList = [];
-					batchData.push(sObj.METRCUID);
-					itemCodeList = jsonModel.getProperty("/allItemsList");
-					var rObj = $.grep(itemCodeList, function (item) {
-						if (item.ItemCode && item.ItemCode !== "" && item.ItemCode.search(sObj.ItemCode) !== -1) {
-							return item;
-						}
-					});
-					if (rObj.length > 0) {
-						var arr = [];
-						var rObj2 = $.grep(itemCodeList, function (item) {
-							if (item.ItemsGroupCode && rObj[0].ItemsGroupCode == item.ItemsGroupCode) {
-								arr.push(item);
+				this.loadItemData().then((itemCodeList) => {
+					$.each(sItems, function (i, e) {
+						sObj = table.getContextByIndex(e).getObject();
+						sObj.STATUSQTY = "None";
+						sObj.U_NLABEL = "";
+						sObj.QTYTXT = "";
+						sObj.NQNTY = "";
+						sObj.tagCode = "";
+						sObj.NTRID = "";
+						sObj.NSTLN = "";
+						sObj.NSTLNCODE = "";
+						sObj.NPDNMText = "";
+						sObj.selectedItemKey = "";
+						//sObj.NPDNMCode = "";
+						sObj.SNO = "#" + (i + 1);
+						sObj.itemList = [];
+						batchData.push(sObj.METRCUID);
+						var rObj = $.grep(itemCodeList, function (item) {
+							if (item.ItemCode && item.ItemCode !== "" && item.ItemCode.search(sObj.ItemCode) !== -1) {
+								return item;
 							}
 						});
-						sObj.itemList = arr;
+						if (rObj.length > 0) {
+							var arr = [];
+							var rObj2 = $.grep(itemCodeList, function (item) {
+								if (item.ItemsGroupCode && rObj[0].ItemsGroupCode == item.ItemsGroupCode) {
+									arr.push(item);
+								}
+							});
+							sObj.itemList = arr;
+						}
+						sArrayObj.push(sObj);
+					});
+					jsonModel.setProperty("/createPackageData", sArrayObj);
+					if (sArrayObj.length > 0) {
+						this.getBatchNumbersAllocation(batchData).then(this.proceedToOpenPkgDialog.bind(this))
+					} else {
+						sap.m.MessageToast.show("Please select a batch");
 					}
-					sArrayObj.push(sObj);
 				});
-				jsonModel.setProperty("/createPackageData", sArrayObj);
 			}
-			if (sArrayObj.length > 0) {
-				this.getBatchNumbersAllocation(batchData).then(this.proceedToOpenPkgDialog.bind(this))
-			} else {
-				sap.m.MessageToast.show("Please select a batch");
-			}
+
 		},
 
 		proceedToOpenPkgDialog: function (flagToOpen) {
 			if (flagToOpen) {
 				var jsonModel = this.getView().getModel("jsonModel");
-				this.loadItemData();
 				if (!this.createPackage) {
 					this.createPackage = sap.ui.xmlfragment("createNewPackage", "com.9b.mrInv.view.fragments.CreateNewPackages", this);
 					this.getView().addDependent(this.createPackage);
@@ -4575,8 +4570,6 @@ sap.ui.define([
 			this.loadLocationsDataInPkg();
 			var table = this.getView().byId("mrInvTable");
 			sItems = table.getSelectedIndices();
-			this.loadItemData();
-			var allItemsList = jsonModel.getProperty("/allItemsList");
 			if (sItems.length > 0) {
 				if (!this.adjustQtyDialog) {
 					this.adjustQtyDialog = sap.ui.xmlfragment("adjustQty", "com.9b.mrInv.view.fragments.AdjustQuantity",
@@ -4585,37 +4578,38 @@ sap.ui.define([
 				}
 				this.loadMetrcWasteReasons();
 				this.adjustQtyDialog.open();
-				var batches = [];
-				$.each(sItems, function (i, e) {
-					var updateObject;
-					updateObject = table.getContextByIndex(e).getObject();
-					updateObject.NOTES = "";
-					updateObject.AQTY = "";
-					updateObject.NEWQTY = "";
-					updateObject.REASON = "";
-					updateObject.STATUSAdjust = "None";
-					updateObject.STATUSTEXTAdjust = "";
-					updateObject.SNO = "#" + (i + 1);
+				this.loadItemData().then((allItemsList) => {
+					var batches = [];
+					$.each(sItems, function (i, e) {
+						var updateObject;
+						updateObject = table.getContextByIndex(e).getObject();
+						updateObject.NOTES = "";
+						updateObject.AQTY = "";
+						updateObject.NEWQTY = "";
+						updateObject.REASON = "";
+						updateObject.STATUSAdjust = "None";
+						updateObject.STATUSTEXTAdjust = "";
+						updateObject.SNO = "#" + (i + 1);
 
-					var dryCanGrpItem = $.grep(allItemsList, function (e) {
-						if (e.ItemCode && updateObject.ItemCode == e.ItemCode) {
-							return e;
+						var dryCanGrpItem = $.grep(allItemsList, function (e) {
+							if (e.ItemCode && updateObject.ItemCode == e.ItemCode) {
+								return e;
+							}
+						});
+						if (dryCanGrpItem.length > 0) {
+							updateObject.UOMCode = dryCanGrpItem[0].InventoryUOM;
 						}
+						batches.push(updateObject);
 					});
 
-					if (dryCanGrpItem.length > 0) {
-						updateObject.UOMCode = dryCanGrpItem[0].InventoryUOM;
-					}
-
-					batches.push(updateObject);
+					jsonModel.setProperty("/temREASON", "");
+					jsonModel.setProperty("/temNOTES", "");
+					jsonModel.setProperty("/batches", batches);
 				});
 			} else {
 				sap.m.MessageToast.show("Please select a batch");
 			}
-			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
-			jsonModel.setProperty("/temREASON", "");
-			jsonModel.setProperty("/temNOTES", "");
-			jsonModel.setProperty("/batches", batches);
+
 		},
 		onConfirmAdjust: function () {
 			var jsonModel = this.getOwnerComponent().getModel("jsonModel");
@@ -5085,19 +5079,19 @@ sap.ui.define([
 					}
 				});*/
 
-			var that = this;
-			var metrcUrl = "/retailid/v2/receive/" + rId + "?licenseNumber=" + license;
-			this.callMetricsGETService2(metrcUrl, function (itemData) {
-				if (itemData && itemData.Eaches && itemData.Eaches.length > 0) {
-					jsonModel.setProperty("/mRetailData", itemData.Eaches);
-				} else {
-					sap.m.MessageToast.show("Data not found for this tag");
-				}
+			/*	var that = this;
+				var metrcUrl = "/retailid/v2/receive/" + rId + "?licenseNumber=" + license;
+				this.callMetricsGETService2(metrcUrl, function (itemData) {
+					if (itemData && itemData.Eaches && itemData.Eaches.length > 0) {
+						jsonModel.setProperty("/mRetailData", itemData.Eaches);
+					} else {
+						sap.m.MessageToast.show("Data not found for this tag");
+					}
 
-			}, function (error) {
-				that.getView().setBusy(false);
-				sap.m.MessageToast.show(JSON.stringify(error));
-			});
+				}, function (error) {
+					that.getView().setBusy(false);
+					sap.m.MessageToast.show(JSON.stringify(error));
+				});*/
 
 		},
 		validateRetailID: function (oEvent) {
@@ -5121,11 +5115,12 @@ sap.ui.define([
 			var jsonModel = this.getView().getModel("jsonModel");
 			var that = this;
 			var selectedRIDs = jsonModel.getProperty("/selectedRIDs");
-			var hasKeyValue = selectedRIDs.some(obj => obj.key !== "" && obj.valueState == "None");
+			var hasKeyValue = selectedRIDs.some(obj => obj.key !== "");
 			var sMETRCUID = jsonModel.getProperty("/sMETRCUID");
 			if (hasKeyValue) {
 				var sUrl, baseUrl, sPath, batchUrl = [],
 					jsonArr = [];
+				//	var validUrl = that.isValidWebURL(selectedRIDs[0].key);
 				sUrl = new URL(selectedRIDs[0].key);
 				baseUrl = `${sUrl.protocol}//${sUrl.hostname}`;
 				$.each(selectedRIDs, function (i, e) {
@@ -5158,6 +5153,8 @@ sap.ui.define([
 					}
 
 				});
+			} else {
+				sap.m.MessageToast.show("Please enter a Retail ID.");
 			}
 		}
 	});

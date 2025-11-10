@@ -1780,6 +1780,10 @@ sap.ui.define([
 				}
 			});
 		},
+		isValidWebURL: function (url) {
+			const pattern = /^(https?:\/\/)[^\s$.?#].[^\s]*$/i;
+			return pattern.test(url);
+		}
 
 	});
 });
